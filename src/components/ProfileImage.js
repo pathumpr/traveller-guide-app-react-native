@@ -18,7 +18,7 @@ const ProfileImage = (props) => {
             <View style={styles.container}>
                 {/* <TouchableOpacity> */}
 
-                    <Image source={profilePhoto == 'not set' ? require('../assets/images/profile_pic.jpg') : {uri:profilePhoto}} resizeMode='contain' style={styles.logo}/>
+                    <Image source={profilePhoto == 'https://triptosters.enricharcane.info/not set' ? require('../assets/images/profile_pic.jpg') : {uri:profilePhoto}} resizeMode='contain' style={styles.logo}/>
 
                 {/* </TouchableOpacity> */}
 

@@ -7,7 +7,8 @@ import { View,
          SafeAreaView,
          Button,
          Alert,
-         TextInput
+         TextInput,
+         ActivityIndicator, 
 } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import { Dimensions } from 'react-native';
@@ -31,6 +32,8 @@ const Login = ()=>{
 
     const navigation = useNavigation();
     const BottomTabNavigator = createBottomTabNavigator();
+
+    const [isLoading, setIsLoading] = useState(false);
 
     // show hide password
     const [value, setValue] = useState(true);
@@ -98,6 +101,7 @@ const Login = ()=>{
     const [fieldsError, setFieldsError] = useState('');
     const login = ()=>{
     // console.log(numOfErr)
+    setIsLoading(true);
 
         if(numOfErr == 0){
 
@@ -111,13 +115,11 @@ const Login = ()=>{
                     email,
                     password,
                 },).then(response => {
-                    // console.log(response.data['status']);
+
                     console.log(response.data['username']);
-                    // console.log(response.data['modUsername']);
-                    // console.log(response.data['photo']);
+
                     if(response.data['status'] == 'success'){
 
-                        setFieldsError(response.data['username'])
                         Toast.show({
                             type: 'success',
                             text1: 'Welcome ' + response.data['username'] + '!',
@@ -134,18 +136,22 @@ const Login = ()=>{
                         global.profilePhoto = response.data['photo'];
 
                         navigation.navigate('Main', { screen: 'Home' });
+                        setIsLoading(false);
 
                     }else{
                         setFieldsError(response.data)
                     }
                 }).catch(error =>{
+                    setIsLoading(false);
                     console.log(error);
                 })
 
             }else{
+                setIsLoading(false);
                 setFieldsError('Input fields are required')
             }
         }else{
+            setIsLoading(false);
             setFieldsError('')
         }
     }
@@ -159,6 +165,10 @@ const Login = ()=>{
 
             <View style={styles.container}>
 
+                {/* Activity indicator */}
+                {isLoading ? (
+                    <ActivityIndicator size="large" color="#fcba03" />
+                ) :(<Text></Text>)}
 
                 <View style={styles.section1}>
 

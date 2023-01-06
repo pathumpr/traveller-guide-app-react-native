@@ -7,6 +7,7 @@ import { View,
          TouchableOpacity,
          Image,
          Alert,
+         ActivityIndicator,
     } from 'react-native';
     import { Dimensions } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
@@ -30,16 +31,19 @@ const MyAccount = ()=>{
 
     const navigation = useNavigation();
     const [data, setData] = useState(null);
+    const [isLoading, setIsLoading] = useState(false);
 
     const [country, setCountry] = useState();
 
     useEffect(() => {
+        setIsLoading(true)
 
         console.log('My Account');
 
         axios.get(APP_URL + 'get-my-account-data/' + userName)
         .then((response) => {
-            if (response.status === 200) {                
+            if (response.status === 200) {  
+                setIsLoading(false)              
                 console.log(response.data['country']);
                 setCountry(response.data['country']);
             } else {
@@ -47,6 +51,7 @@ const MyAccount = ()=>{
             }
         }).catch((error) => {
             console.error(error);
+            setIsLoading(false)
         });
 
     }, [])
@@ -85,13 +90,19 @@ const MyAccount = ()=>{
 
                 <H1 value='My Account'/>
                 <View style={styles.body}>
+
+                {/* Activity indicator */}
+                {isLoading ? (
+                    <ActivityIndicator size="large" color="#fcba03" />
+                ) :(<Text></Text>)}
+
                     <View style={styles.container}>
 
                     <View style={styles.profileImagePicker}>
                         <View style={styles.profileImagePickerContainer}>
                             <TouchableOpacity onPress={ openGallery }>
             
-                                <Image source={profilePhoto == 'not set' ? require('../assets/images/profile_pic.jpg') : {uri:profilePhoto} } resizeMode='contain' style={styles.logo} />
+                                <Image source={profilePhoto == 'https://triptosters.enricharcane.info/not set' ? require('../assets/images/profile_pic.jpg') : {uri:profilePhoto} } resizeMode='contain' style={styles.logo} />
 
                                 <H4 value='Change'/>
 
@@ -115,7 +126,7 @@ const MyAccount = ()=>{
                         <View style={styles.smallFormLabel}>
                             <View style={styles.label}>
                                 <Text style={styles.labelTextCountry}>
-                                    {country}
+                                    ID{id.replace(/"|"/gi, ' ')}
                                 </Text>
                             </View>
                         </View>
@@ -126,7 +137,7 @@ const MyAccount = ()=>{
                         <View style={styles.smallFormLabel}>
                             <View style={styles.label}>
                                 <Text style={styles.labelTextId}>
-                                    ID {id}
+                                    {country}
                                 </Text>
                             </View>
                         </View>

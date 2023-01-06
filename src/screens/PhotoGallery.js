@@ -6,6 +6,7 @@ import { View,
          TextInput,
          TouchableOpacity,
          Image,
+         ActivityIndicator,
 } from 'react-native';
 import { Dimensions } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
@@ -32,6 +33,7 @@ import { set } from 'react-native-reanimated';
 const PhotoGallery = (props)=>{
 
     const navigation = useNavigation();
+    const [isLoading, setIsLoading] = useState(false);
 
     // set images
     const [image1, setImage1] = useState('not set');
@@ -56,6 +58,7 @@ const PhotoGallery = (props)=>{
     ]);
 
     useEffect(() => {
+        setIsLoading(true)
         console.log('Photo gallery');
         getData();
     }, [])
@@ -72,10 +75,18 @@ const PhotoGallery = (props)=>{
         // setMyArray('');
         setDeskError('');
 
+        console.log(id)
+        console.log(profilePhoto)
+        console.log(typeof id)
+        console.log(parseInt(id, 10));
+        console.log(Number(id))
+
         // get gallery images from API
         axios.get(APP_URL + 'get-gallery-photos/' + id)
         .then((response) => {
 
+            setIsLoading(false)
+            
             console.log(response.data['value'])
             // console.log(response.data['data'])
 
@@ -95,6 +106,7 @@ const PhotoGallery = (props)=>{
 
         }).catch((error) => {
             console.error(error);
+            setIsLoading(false)
         });
     }
 
@@ -169,6 +181,7 @@ const PhotoGallery = (props)=>{
 
     //Upload button
     const upload = () => {
+        setIsLoading(true)
 
         console.log(numOfErr)
 
@@ -224,6 +237,7 @@ const PhotoGallery = (props)=>{
                 )
                 .then(response => {
                     console.log(response)
+                    setIsLoading(false)
 
                     if(response == 'success'){
 
@@ -243,12 +257,15 @@ const PhotoGallery = (props)=>{
                 })
                 .catch(error => {
                     console.log(error);
+                    setIsLoading(false)
                 });
             }else{
                 setDeskError('All fields are required')
+                setIsLoading(false)
             }
         }else{
             setFieldErr('Select at least three images')
+            setIsLoading(false)
         }
     }
 
@@ -259,6 +276,7 @@ const PhotoGallery = (props)=>{
             <ScrollView>
             
                 <H1 value='Photo Gallery' path={profilePhoto} />
+
                 <View style={styles.body}>
 
                     <View style={styles.container}>
@@ -281,7 +299,7 @@ const PhotoGallery = (props)=>{
                                 <View style={styles.formLabel}>
                                     <View style={styles.label}>
                                         <Text style={styles.labelTextId}>
-                                            ID {id}
+                                            ID{id.replace(/"|"/gi, ' ')}
                                         </Text>
                                     </View>
                                 </View>
@@ -410,6 +428,9 @@ const PhotoGallery = (props)=>{
                             </TouchableOpacity>
                         </View>
 
+                        {/* Activity indicator */}
+                        {isLoading ? (<ActivityIndicator size="large" color="#fcba03" />) : (<Text></Text>)}
+
                         <BasicContainer>
                             <H2 value='My Gallery' />
                         </BasicContainer>
@@ -453,7 +474,7 @@ const PhotoGallery = (props)=>{
 const screenWidth =  Dimensions.get('window').width;
 const screenHeight = Dimensions.get('window').height;
 
-const imgsize = screenWidth/3.67
+const imgsize = screenWidth/3.67 - 5
 
 const styles = StyleSheet.create({
 
@@ -485,7 +506,7 @@ const styles = StyleSheet.create({
         flexDirection: 'column',
         justifyContent: 'center',
         alignItems: 'center',
-        margin: 2,
+        marginBottom: 12,
     },
     placeText:{
         color:Colors.placeholderColor,
@@ -593,7 +614,7 @@ const styles = StyleSheet.create({
     selectCard:{
         width: '100%',
         height: '90%',
-        // backgroundColor: '#dbdbdb',
+        backgroundColor: '#000',
         borderRadius: 10,
         borderWidth: 1.5,
         borderColor: '#d9d9d9',
@@ -602,25 +623,25 @@ const styles = StyleSheet.create({
         justifyContent:'center',
         alignItems:'center',
     },   
-    selectText:{
-        fontSize: 12,
-        fontWeight: '400',
-        color: '#808080',
-        padding: 2,
-    },
+    // selectText:{
+    //     fontSize: 12,
+    //     fontWeight: '400',
+    //     color: '#808080',
+    //     padding: 2,
+    // },
     selectIcon:{
         // width: '100%',
         // height: '100%',
-        // backgroundColor: '#000',
+        backgroundColor: '#fff',
         display: 'flex',
         flexDirection: 'column',
         justifyContent:'center',
         alignItems:'center',
     },
     logo:{
-        height: imgsize-15,
-        width: imgsize-7,
-        borderRadius: 8,
+        height: imgsize,
+        width: imgsize,
+        borderRadius: 5,
     },
     errorTextContainer:{
         display: 'flex',

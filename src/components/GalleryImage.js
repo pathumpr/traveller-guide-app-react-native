@@ -23,7 +23,7 @@ const GalleryImage = (props) =>{
     const screenWidth =  Dimensions.get('window').width;
     const screenHeight = Dimensions.get('window').height;
 
-    const imgsize = screenWidth/3.67
+    const imgsize = screenWidth/3.67 - 5 
 
 const styles = StyleSheet.create({
 

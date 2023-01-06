@@ -4,10 +4,12 @@ import { View,
          StyleSheet,
          SafeAreaView,
          Image,
+         ActivityIndicator,
 } from 'react-native';
 import ImageCard from '../components/ImageCard';
 import BalanceCard from '../components/BalanceCard';
 import ImageBox from '../components/ImageBox';
+import ImageBox2 from '../components/ImageBox2';
 import { Dimensions } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import { RotateInUpLeft } from 'react-native-reanimated';
@@ -36,10 +38,13 @@ function getTimeOfDay() {
 
 const Home = ({ route })=>{
 
+    const [isLoading, setIsLoading] = useState(false);
+
     const [timeOfDay, setTimeOfDay] = useState(getTimeOfDay());
     const [timeNow, setTimeNow] = useState(getTimeOfDay());
 
     useEffect(() => {
+        setIsLoading(true)
         console.log('Home');
         setTimeOfDay(getTimeOfDay());
 
@@ -54,6 +59,7 @@ const Home = ({ route })=>{
         axios.get(APP_URL + 'get-data/' + userName)
         .then((response) => {
             if (response.status === 200) {
+                setIsLoading(false)
 
                 // console.log(response.data['status']);
                 // console.log(response.data['photo']);
@@ -61,7 +67,7 @@ const Home = ({ route })=>{
                 console.log(timeOfDay)
 
                 AsyncStorage.setItem('asyncGalleryPhotoUri', response.data['photo']);
-                AsyncStorage.setItem('asyncId', JSON.stringify(response.data['id']));
+                AsyncStorage.setItem('asyncId', response.data['id']);
                 AsyncStorage.setItem('asyncName', response.data['name']);
                 AsyncStorage.setItem('asyncTime', timeOfDay);
 
@@ -70,13 +76,17 @@ const Home = ({ route })=>{
                 global.name = response.data['name']
                 global.time = timeOfDay;
 
+                console.log(id)
+
                 setTimeNow(time)
 
             } else {
                 console.error('Error:', response.status);
+                setIsLoading(false)
             }
         }).catch((error) => {
             console.error(error);
+            setIsLoading(false)
         });
 
     }
@@ -85,6 +95,11 @@ const Home = ({ route })=>{
 
         <SafeAreaView style={styles.body}>
                 <View style={styles.container}>
+
+                {/* Activity indicator */}
+                {isLoading ? (
+                    <ActivityIndicator size="large" color="#fcba03" />
+                ) :(<Text></Text>)}
 
                     <View style={styles.section1}>
 
@@ -112,27 +127,27 @@ const Home = ({ route })=>{
                                 <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
 
                                     <View style={styles.slideImage}>
-                                        <ImageBox/>
+                                        <ImageBox2/>
                                         <Text style={styles.placeText}>
-                                            Place
+                                            Place 1
                                         </Text>
                                     </View>
                                     <View style={styles.slideImage}>
-                                        <ImageBox/>
+                                        <ImageBox2/>
                                         <Text style={styles.placeText}>
-                                            Place
+                                            Place 2
                                         </Text>
                                     </View>
                                     <View style={styles.slideImage}>
-                                        <ImageBox/>
+                                        <ImageBox2/>
                                         <Text style={styles.placeText}>
-                                            Place
+                                            Place 3
                                         </Text>
                                     </View>
                                     <View style={styles.slideImage}>
-                                        <ImageBox/>
+                                        <ImageBox2/>
                                         <Text style={styles.placeText}>
-                                            Place
+                                            Place 4
                                         </Text>
                                     </View>
 

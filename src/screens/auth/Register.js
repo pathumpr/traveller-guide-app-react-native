@@ -6,8 +6,7 @@ import { View,
         TextInput,  
         Text,
         Image,
-        PixelRatio, 
-        Switch,
+        ActivityIndicator,
 } from 'react-native';
 import Ionicon from 'react-native-vector-icons/Ionicons';
 import Icon from 'react-native-vector-icons/FontAwesome';
@@ -30,6 +29,8 @@ import H2 from '../../components/H2';
 import { Button } from 'react-native-paper';
 
 const Register = ({ navigation }) =>{
+
+    const [isLoading, setIsLoading] = useState(false);
 
     // Country picker
     const [open, setOpen] = useState(false);
@@ -340,6 +341,7 @@ const Register = ({ navigation }) =>{
                 global.profilePhoto = galleryPhotoUri;
 
                 navigation.navigate('Main', { screen: 'Home' });
+                setIsLoading(false);
 
             }else{
                 console.log('Something went wrong');
@@ -356,6 +358,7 @@ const Register = ({ navigation }) =>{
     //Register button function    
     const [fieldsError, setFieldsError] = useState('');
     const register = async ()=>{
+        setIsLoading(true);
         // console.log(numOfErr)
 
         if(numOfErr == 0){
@@ -414,6 +417,7 @@ const Register = ({ navigation }) =>{
                             global.subUsername = subUsername;
                             
                             navigation.navigate('Main', { screen: 'Home' });
+                            setIsLoading(false);
 
                         }else{
                             
@@ -424,18 +428,22 @@ const Register = ({ navigation }) =>{
 
                     }else{
                         setFieldsError(response.data)
+                        setIsLoading(false);
                     }
 
                   })
                   .catch(error => {
                     console.log(error);
+                    setIsLoading(false);
                   });
 
             }else{
                 setFieldsError('Input fields are required')
+                setIsLoading(false);
             }
         }else{
             setFieldsError('')
+            setIsLoading(false);
         }
     }
 
@@ -726,6 +734,11 @@ const Register = ({ navigation }) =>{
                             </View>
 
                         </View>
+
+                        {/* Activity indicator */}
+                        {isLoading ? (
+                            <ActivityIndicator size="large" color="#fcba03" />
+                        ) :(<Text></Text>)}
 
                         <View style={styles.navigateArea} >
                             <Divider/>

@@ -21,8 +21,8 @@ const Splash = () =>{
           const username = await AsyncStorage.getItem('asyncUsername');
           const galleryPhotoUri = await AsyncStorage.getItem('asyncGalleryPhotoUri');
           const subUsername = await AsyncStorage.getItem('asyncSubUsername');
-          const name = await AsyncStorage.getItem('asyncId');
-          const id = await AsyncStorage.getItem('asyncName');
+          const id = await AsyncStorage.getItem('asyncId');
+          const name = await AsyncStorage.getItem('asyncName');
 
           if (username) {
 
