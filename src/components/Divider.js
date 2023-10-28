@@ -6,7 +6,8 @@ const Divider = ()=>{
 
     return(
 
-        <View style={styles.divider} />
+            <View style={styles.divider} />
+
 
     )
 
@@ -19,7 +20,7 @@ const styles = StyleSheet.create({
         height: 1.5,
         backgroundColor: '#dbdbdb',
         // backgroundColor: 'gray',
-    }
+    },
 
 })
 

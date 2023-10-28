@@ -5,26 +5,26 @@ import { View,
          SafeAreaView,
          Image,
          ActivityIndicator,
+         TouchableOpacity,
 } from 'react-native';
 import ImageCard from '../components/ImageCard';
 import BalanceCard from '../components/BalanceCard';
-import ImageBox from '../components/ImageBox';
-import ImageBox2 from '../components/ImageBox2';
 import { Dimensions } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
-import { RotateInUpLeft } from 'react-native-reanimated';
 import Colors from '../styles/Colors';
-
+import EmptyImage from '../assets/images/empty.jpg';
 import {APP_URL, RESOURCE_URL} from '../constants/App';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
+import ImageBox2 from '../components/ImageBox2';
+import ImageBox3 from '../components/ImageBox3';
+import GalleryImage2 from '../components/GalleryImage2';
 
 
 function getTimeOfDay() {
     const date = new Date();
-    const hour = date.getHours();
-  
+    const hour = date.getHours();  
     if (hour >= 6 && hour < 12) {
       return 'Good morning,';
     } else if (hour >= 12 && hour < 17) {
@@ -39,84 +39,49 @@ function getTimeOfDay() {
 const Home = ({ route })=>{
 
     const [isLoading, setIsLoading] = useState(false);
-
     const [timeOfDay, setTimeOfDay] = useState(getTimeOfDay());
     const [timeNow, setTimeNow] = useState(getTimeOfDay());
+
+    const [recentArray, setRecentArray] = useState([]);
 
     useEffect(() => {
         setIsLoading(true)
         console.log('Home');
         setTimeOfDay(getTimeOfDay());
+        setIsLoading(false)
 
-        profilePhoto();
+        axios.get(APP_URL + 'get-recent-tours/' + id)
+        .then((response)=>{
+            if(response.data['value'] != 0){
+                setRecentArray(response.data['data'])
+            }else{
+                setRecentArray([])
+                // console.log(recentArray)
+            }
+        })
+        .catch((error)=>{
+            console.error(error.response.data)
+        })
+
     }, []);
 
-    // load profile photo to home screen
-    const profilePhoto = ()=>{
-
-        // console.log('Function');
-
-        axios.get(APP_URL + 'get-data/' + userName)
-        .then((response) => {
-            if (response.status === 200) {
-                setIsLoading(false)
-
-                // console.log(response.data['status']);
-                // console.log(response.data['photo']);
-                // console.log(response.data['time']);
-                console.log(timeOfDay)
-
-                AsyncStorage.setItem('asyncGalleryPhotoUri', response.data['photo']);
-                AsyncStorage.setItem('asyncId', response.data['id']);
-                AsyncStorage.setItem('asyncName', response.data['name']);
-                AsyncStorage.setItem('asyncTime', timeOfDay);
-
-                global.profilePhoto = response.data['photo'];
-                global.id = JSON.stringify(response.data['id'])
-                global.name = response.data['name']
-                global.time = timeOfDay;
-
-                console.log(id)
-
-                setTimeNow(time)
-
-            } else {
-                console.error('Error:', response.status);
-                setIsLoading(false)
-            }
-        }).catch((error) => {
-            console.error(error);
-            setIsLoading(false)
-        });
-
-    }
-
     return(
-
         <SafeAreaView style={styles.body}>
                 <View style={styles.container}>
-
-                {/* Activity indicator */}
-                {isLoading ? (
-                    <ActivityIndicator size="large" color="#fcba03" />
-                ) :(<Text></Text>)}
+                    {/* Activity indicator */}
+                    {isLoading ? (<ActivityIndicator size="large" color="#fcba03" />) :(<Text></Text>)}
 
                     <View style={styles.section1}>
-
                         <Image source={require('../assets/images/logo.png')}     
                         resizeMode='contain' style={styles.logo} />
-
                     </View>
 
                     <View style={styles.section2}>
-
                         <ImageCard time={timeNow} />
                         <BalanceCard/>
-
                     </View>
 
                     <View style={styles.section3}>
-
                         <View style={styles.card}>
                             <View style={styles.top}>
                                 <Text style={styles.text}>
@@ -124,44 +89,35 @@ const Home = ({ route })=>{
                                 </Text>
                             </View>
                             <View style={styles.bottom}>
-                                <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
+                                <ScrollView horizontal={true} showsHorizontalScrollIndicator={false} style={styles.scrollView}>
 
-                                    <View style={styles.slideImage}>
-                                        <ImageBox2/>
-                                        <Text style={styles.placeText}>
-                                            Place 1
-                                        </Text>
-                                    </View>
-                                    <View style={styles.slideImage}>
-                                        <ImageBox2/>
-                                        <Text style={styles.placeText}>
-                                            Place 2
-                                        </Text>
-                                    </View>
-                                    <View style={styles.slideImage}>
-                                        <ImageBox2/>
-                                        <Text style={styles.placeText}>
-                                            Place 3
-                                        </Text>
-                                    </View>
-                                    <View style={styles.slideImage}>
-                                        <ImageBox2/>
-                                        <Text style={styles.placeText}>
-                                            Place 4
-                                        </Text>
-                                    </View>
+                                    {
+                                    
+                                        recentArray.length == 0 ?
+                                        <View style={styles.singleItem}>
+                                        <Image source={require('../assets/images/empty.jpg')} style={styles.image}/>
+                                        </View> : 
+                                        recentArray.map((item, index)=>{
+                                            console.log(item)
+                                            return(
+                                                <TouchableOpacity key={index} onPress={()=>{
+                                                    console.log(index)
+                                                }}>
+                                                    <View style={styles.singleItem}>
+                                                        <Image source={{uri:RESOURCE_URL + item}} style={styles.image}/>
+                                                    </View>
+                                                </TouchableOpacity>
+                                            )
+                                        })
+                                    }
 
                                 </ScrollView>
                             </View>
                         </View>
-
                     </View>
                 </View>
         </SafeAreaView>
-        
-
     )
-
 }
 
 const windowWidth = Dimensions.get('window').width;
@@ -241,24 +197,31 @@ const styles = StyleSheet.create({
     },
     text:{
         color: Colors.blackText,
-        marginLeft: 10,
+        // marginLeft: 10,
         // marginTop: 10,
         fontWeight: 'bold',
     },
-    slideImage:{
-        // width: 125,
-        marginLeft: 10,
+    scrollView:{
+        width: '100%',
+        height: 120,
+        // backgroundColor: 'red',
+    },  
+    singleItem:{
+        width: 120,
         height: '100%',
+        // backgroundColor: 'green',
+        marginRight: 15,
         display: 'flex',
-        flexDirection: 'column',
         justifyContent: 'center',
         alignItems: 'center',
     },
-    placeText:{
-        color:Colors.placeholderColor,
+    image:{
+        width: '100%',
+        height: '100%',
+        borderRadius: 10,
+        // width: 10,
+        // height: 10,
     },
-
-
 })
 
 export default Home;

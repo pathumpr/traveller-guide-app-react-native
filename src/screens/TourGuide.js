@@ -447,7 +447,7 @@ const styles = StyleSheet.create({
         // backgroundColor: '#000',
         borderRadius: 10,
         borderWidth: 1.5,
-        borderColor: Colors.borderColor,
+        borderColor: Colors.blackText,
         display: 'flex',
         flexDirection: 'row',
         alignItems: 'center',

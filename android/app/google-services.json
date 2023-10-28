@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "216892824721",
+    "project_id": "triptosters-guide-e9d0a",
+    "storage_bucket": "triptosters-guide-e9d0a.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:216892824721:android:bd51a86e014f2ac1443330",
+        "android_client_info": {
+          "package_name": "com.enricharcane.triptostersguide"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "216892824721-b51h2rvu0hvv3rbtm9p5gef031fqrl58.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC-39eBexoizHUJxJMq4YQr0Cn5EpTX9SA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "216892824721-b51h2rvu0hvv3rbtm9p5gef031fqrl58.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

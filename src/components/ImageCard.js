@@ -4,44 +4,27 @@ import { View,
          Text,
          Image
 } from 'react-native'
-import ImageBox from './ImageBox'
 import Colors from '../styles/Colors';
 
-
 const ImageCard = (props) =>{
-
     return(
-
         <View style={styles.body}>
             <View style={styles.card}>
-
                 <View style={styles.left}>
-
                     <Text style={styles.text1}> {props.time} </Text>
-
-                    <Text style={styles.text2}> {subUsername} </Text>
-
+                    <Text style={styles.text2}> {modName} </Text>
                     <Text style={styles.text3}> Let's Continue </Text>
-
                 </View>
                 <View style={styles.right}>
-
                     <View style={{marginRight: 10}}>
-
                         <View style={styles.boxBody}>
-                            <Image source={profilePhoto == 'not set' ? require('../assets/images/profile_pic.jpg') : {uri:profilePhoto}} resizeMode='contain' style={styles.image}/>
-                            
+                            <Image source={profileImage == 'not set' ? require('../assets/images/profile_pic.jpg') : {uri:profileImage}} resizeMode='contain' style={styles.image}/>                   
                         </View>
-
                     </View>
-
                 </View>
-
             </View>
         </View>
-
     )
-
 }
 
 const styles = StyleSheet.create({
@@ -61,7 +44,7 @@ const styles = StyleSheet.create({
         // backgroundColor: '#000',
         borderRadius: 10,
         borderWidth: 1.5,
-        borderColor: Colors.borderColor,
+        borderColor: Colors.placeholderColor,
         display: 'flex',
         flexDirection: 'row',
     },  

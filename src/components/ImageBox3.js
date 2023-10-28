@@ -8,7 +8,7 @@ const ImageBox = (props) =>{
     return(
 
         <View style={styles.body}>
-            <Image source={require('../assets/images/empty.jpg')} resizeMode='contain' style={styles.img} />
+            <Image source={{uri:props.path}} resizeMode='contain' style={styles.img} />
         </View>
     )
 }

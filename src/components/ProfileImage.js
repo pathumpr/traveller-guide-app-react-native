@@ -1,38 +1,21 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
     View,
     StyleSheet,
     Image,
-    Text,
-    TouchableOpacity,
 }from "react-native";
-import H2 from './H2';
-
-
 
 const ProfileImage = (props) => {
-
-    return(
-        
+    return(        
         <View style={styles.body}>
             <View style={styles.container}>
-                {/* <TouchableOpacity> */}
-
-                    <Image source={profilePhoto == 'https://triptosters.enricharcane.info/not set' ? require('../assets/images/profile_pic.jpg') : {uri:profilePhoto}} resizeMode='contain' style={styles.logo}/>
-
-                {/* </TouchableOpacity> */}
-
-                {/* <H2 value={props.value}/> */}
-
+                    <Image source={profileImage == 'https://triptosters.enricharcane.info/not set' ? require('../assets/images/profile_pic.jpg') : {uri:profileImage}} resizeMode='contain' style={styles.logo}/>
             </View>
         </View>
-
     )
-
 }
 
 const styles = StyleSheet.create({
-
     body:{
         width: '100%',
         height: 160,
@@ -56,7 +39,6 @@ const styles = StyleSheet.create({
         borderRadius: 150,
         height: 140,
     },
-
 })
 
 export default ProfileImage ;

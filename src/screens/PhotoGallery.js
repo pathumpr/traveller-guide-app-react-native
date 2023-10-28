@@ -19,19 +19,13 @@ import H2 from '../components/H2';
 import SelectImage from '../components/SelectImage';
 import GalleryImage from '../components/GalleryImage';
 import Colors from '../styles/Colors';
-import Icon from 'react-native-vector-icons/FontAwesome';
 import ImagePicker from 'react-native-image-crop-picker';
 
 import {APP_URL, RESOURCE_URL} from '../constants/App';
 import axios from 'axios';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
-import { set } from 'react-native-reanimated';
 
-
-
-const PhotoGallery = (props)=>{
-
+const PhotoGallery = ()=>{
     const navigation = useNavigation();
     const [isLoading, setIsLoading] = useState(false);
 
@@ -58,13 +52,12 @@ const PhotoGallery = (props)=>{
     ]);
 
     useEffect(() => {
-        setIsLoading(true)
+        // setIsLoading(true)
         console.log('Photo gallery');
         getData();
     }, [])
 
     const getData =()=>{
-
         setImage1('not set');
         setImage2('not set');
         setImage3('not set');
@@ -72,49 +65,27 @@ const PhotoGallery = (props)=>{
         setDesc1('');
         setDesc2('');
         setDesc3('');
-        // setMyArray('');
         setDeskError('');
-
-        console.log(id)
-        console.log(profilePhoto)
-        console.log(typeof id)
-        console.log(parseInt(id, 10));
-        console.log(Number(id))
-
         // get gallery images from API
-        axios.get(APP_URL + 'get-gallery-photos/' + id)
+        axios.get(APP_URL + 'get-photo-gallery/' + id)
         .then((response) => {
-
-            setIsLoading(false)
-            
-            console.log(response.data['value'])
-            // console.log(response.data['data'])
-
+            setIsLoading(false)      
             if(response.data['value'] > 0){
-                // console.log(response.data['data'])
                 setMyArray(response.data['data']);
             }else{
                 setMyArray([
                     {"gallery_photo": '../assets/images/man.jpg'},
                 ]);
-                // console.log(response.data['data'])
             }
-
-            // console.log(response.data['data'])
-            // setMyArray(response['data']);
-            // console.log(myArray)
-
         }).catch((error) => {
-            console.error(error);
+            console.error(error.response.data);
             setIsLoading(false)
         });
     }
 
     //Desc 1 validation
     const desc1Validating = ()=>{
-
         if(desc1 ==""){
-            console.log("First description is required")
             setDeskError('All fields are required')
             setNumOfErr(1)
         }else{
@@ -122,12 +93,9 @@ const PhotoGallery = (props)=>{
             setNumOfErr(0)
         }
     }
-
     //Desc 2 validation
     const desc2Validating = ()=>{
-
         if(desc2 ==""){
-            console.log("Second description is required")
             setDeskError('All fields are required')
             setNumOfErr(1)
         }else{
@@ -135,12 +103,9 @@ const PhotoGallery = (props)=>{
             setNumOfErr(0)
         }
     }
-
     //Desc 3 validation
     const desc3Validating = ()=>{
-
         if(desc3 ==""){
-            console.log("Third description is required")
             setDeskError('All fields are required')
             setNumOfErr(1)
         }else{
@@ -182,24 +147,14 @@ const PhotoGallery = (props)=>{
     //Upload button
     const upload = () => {
         setIsLoading(true)
-
-        console.log(numOfErr)
-
         if(image1 && image2 && image3 != 'not set'){
             setFieldErr('')
-
-            console.log(desc1)
-            console.log(desc2)
-            console.log(desc3)
-
             if(desc1 && desc2 && desc3 != ''){
-
                 setDeskError('')
 
                 const data = new FormData();
-                data.append('username', userName);
                 data.append('id', id);
-    
+
                 //image 1
                 data.append('photo1', {
                     name: 'photo1.jpg',
@@ -224,11 +179,9 @@ const PhotoGallery = (props)=>{
                     Platform.OS === 'android' ? image3 : image3.replace('file://', ''),     
                 });
                 data.append('desc3', desc3);
-
-                // console.log(data)
     
                 //send data to API
-                fetch(APP_URL+'photo-gallery-upload', {
+                fetch(APP_URL+'photo-gallery', {
                     method: 'POST',
                     body: data,
                 })
@@ -236,17 +189,13 @@ const PhotoGallery = (props)=>{
                     response => response.json()
                 )
                 .then(response => {
-                    console.log(response)
                     setIsLoading(false)
-
                     if(response == 'success'){
-
                         Toast.show({
                             type: 'success',
                             text1: 'Successfully!',
                             text2: 'Photos uploaded successfully'
                         });
-
                         navigation.reset({
                             index: 0,
                             routes: [{ name: 'Gallery' }],
@@ -256,7 +205,7 @@ const PhotoGallery = (props)=>{
                     }       
                 })
                 .catch(error => {
-                    console.log(error);
+                    console.error(error.response.data);
                     setIsLoading(false)
                 });
             }else{
@@ -270,17 +219,12 @@ const PhotoGallery = (props)=>{
     }
 
     return(
-
         <SafeAreaView>
-
             <ScrollView>
-            
-                <H1 value='Photo Gallery' path={profilePhoto} />
 
+                <H1 value='Photo Gallery' path={profileImage} />
                 <View style={styles.body}>
-
                     <View style={styles.container}>
-
                         <ProfileImage/>
 
                             {/* Guide Name */}
@@ -299,7 +243,7 @@ const PhotoGallery = (props)=>{
                                 <View style={styles.formLabel}>
                                     <View style={styles.label}>
                                         <Text style={styles.labelTextId}>
-                                            ID{id.replace(/"|"/gi, ' ')}
+                                            {guideId}
                                         </Text>
                                     </View>
                                 </View>
@@ -310,18 +254,12 @@ const PhotoGallery = (props)=>{
                         </BasicContainer>
 
                             <View style={styles.imageContainer}>
-
                                 <TouchableOpacity onPress={()=>{getImage1()}}>
                                     <View style={styles.selectBody}>
                                         <View style={styles.selectCard}>
                                             <View style={styles.selectIcon}>
 
                                             <Image source={image1 == "not set" ? require('../assets/images/select-5.jpg') : {uri:image1}} resizeMode='cover' style={styles.logo}/>
-
-                                                {/* <Icon name="photo" color={'#808080'} size={44}/> */}
-                                                {/* <Text style={styles.selectText}>
-                                                    Select
-                                                </Text> */}
 
                                             </View>
                                         </View>
@@ -334,11 +272,6 @@ const PhotoGallery = (props)=>{
 
                                             <Image source={image2 == "not set" ? require('../assets/images/select-5.jpg') : {uri:image2}} resizeMode='cover' style={styles.logo}/>
 
-                                                {/* <Icon name="photo" color={'#808080'} size={44}/>
-                                                <Text style={styles.selectText}>
-                                                    Select
-                                                </Text> */}
-
                                             </View>
                                         </View>
                                     </View>
@@ -349,11 +282,6 @@ const PhotoGallery = (props)=>{
                                             <View style={styles.selectIcon}>
 
                                             <Image source={image3 == "not set" ? require('../assets/images/select-5.jpg') : {uri:image3}} resizeMode='cover' style={styles.logo}/>
-
-                                                {/* <Icon name="photo" color={'#808080'} size={44}/>
-                                                <Text style={styles.selectText}>
-                                                    Select
-                                                </Text> */}
 
                                             </View>
                                         </View>
@@ -436,13 +364,6 @@ const PhotoGallery = (props)=>{
                         </BasicContainer>
 
                         <View style={styles.imageContainer}>
-
-                            {/* {myArray.map((item, index) => (
-                                <View key={index} style={styles.slideImage}>
-                                    <GalleryImage path={item.gallery_photo}/>
-                                </View>
-                            ))} */}
-
                             {
                                 myArray.map((object)=>{
                                     return(
@@ -452,8 +373,6 @@ const PhotoGallery = (props)=>{
                                     )
                                 })
                             }
-
-
                         </View>
 
                     </View>
@@ -598,7 +517,6 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         marginTop: -30, 
     },
-
     //Image select styles
     selectBody:{
         // backgroundColor: '#000',

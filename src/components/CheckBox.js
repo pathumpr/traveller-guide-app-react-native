@@ -36,7 +36,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'flex-start',
-        marginLeft: 50,
+        marginLeft: 10,
     },
     label: {
         margin: 8,

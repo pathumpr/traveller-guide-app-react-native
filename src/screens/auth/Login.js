@@ -10,7 +10,6 @@ import { View,
          TextInput,
          ActivityIndicator, 
 } from 'react-native';
-import { ScrollView } from 'react-native-gesture-handler';
 import { Dimensions } from 'react-native';
 import Ionicon from 'react-native-vector-icons/Ionicons';
 import Icon from 'react-native-vector-icons/FontAwesome';
@@ -22,7 +21,9 @@ import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { CommonActions } from '@react-navigation/native';
+
+import { authentication } from "../../constants/firebase";
+import { signInWithEmailAndPassword,auth} from "firebase/auth";
 
 import Divider from '../../components/Divider';
 import TextSmall from '../../components/TextSmall';
@@ -32,7 +33,6 @@ const Login = ()=>{
 
     const navigation = useNavigation();
     const BottomTabNavigator = createBottomTabNavigator();
-
     const [isLoading, setIsLoading] = useState(false);
 
     // show hide password
@@ -50,20 +50,16 @@ const Login = ()=>{
         }
     }
 
-
     // Form validation
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-
     let [numOfErr, setNumOfErr] = useState(0);
 
     //email validation
     const emailRegex = new RegExp(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/i);
-
     const [emailError, setEmailError] = useState('');
     const emailValidate =()=>{
         if(email ==""){
-            console.log("Email is required")
             setEmailError('Email is required')
             setNumOfErr(1)
         }else{
@@ -79,11 +75,9 @@ const Login = ()=>{
 
     //password validation
     const passwordRegex = new RegExp(/^(?=.*)(?=.*[a-z])(?=.*[a-z])(?=.*[a-zA-Z]).{6,}$/i);
-
     const [passwordError, setPasswordError] = useState('');
     const passwordValidate =()=>{
         if(password ==""){
-            console.log("Password is required")
             setPasswordError('Password is required')
             setNumOfErr(1)
         }else{
@@ -100,52 +94,97 @@ const Login = ()=>{
     //Login button function    
     const [fieldsError, setFieldsError] = useState('');
     const login = ()=>{
-    // console.log(numOfErr)
     setIsLoading(true);
-
         if(numOfErr == 0){
-
             if(password && email != ""){
                 setFieldsError('')
+                //Authetication from firebase
+                signInWithEmailAndPassword(authentication, email, password)
+                .then((userCredential) => {
+                    axios.get(APP_URL + 'guide-status/' + userCredential.user.email)
+                    .then((response) => {
+                        if (response.data['status'] == 0) {
+                            console.log('innactive');
 
-                const token = 'triptostersGuideAppEA@2022';
+                            //setup global vars
+                            global.email = userCredential.user.email;
+                            global.id = response.data['id'];
+                            global.guideId = response.data['guide_id'];
+                            global.uid = userCredential.user.uid;
+                            global.name = response.data['name'];
+                            global.modName = response.data['mod_name'];
+                            global.profileImage = response.data['image'];
 
-                axios.post(APP_URL+'login',{
-                    token,
-                    email,
-                    password,
-                },).then(response => {
+                            //setup async storage
+                            AsyncStorage.setItem('asyncEmail', userCredential.user.email);
+                            AsyncStorage.setItem('asyncId', response.data['id']);
+                            AsyncStorage.setItem('asyncGuideId', response.data['guide_id']);
+                            AsyncStorage.setItem('asyncUid', userCredential.user.uid);
+                            AsyncStorage.setItem('asyncName', response.data['name']);
+                            AsyncStorage.setItem('asyncModName', response.data['mod_name']);
+                            AsyncStorage.setItem('asyncProfileImage', response.data['image']);
 
-                    console.log(response.data['username']);
+                            setIsLoading(false);
+                            navigation.navigate('Main', { screen: 'Home' });
 
-                    if(response.data['status'] == 'success'){
+                            console.log(response.data['id']);
 
-                        Toast.show({
-                            type: 'success',
-                            text1: 'Welcome ' + response.data['username'] + '!',
-                            text2: 'Login Successfully'
-                        });
+                        }else if(response.data['status'] == 1) {
+                            console.log('active');
 
-                        AsyncStorage.clear();
-                        AsyncStorage.setItem('asyncUsername', response.data['username']);
-                        AsyncStorage.setItem('asyncSubUsername', response.data['modUsername']);
-                        AsyncStorage.setItem('asyncGalleryPhotoUri', response.data['photo']);
+                            //setup global vars
+                            global.email = userCredential.user.email;
+                            global.id = response.data['id'];
+                            global.guideId = response.data['guide_id'];
+                            global.uid = userCredential.user.uid;
+                            global.name = response.data['name'];
+                            global.modName = response.data['mod_name'];
+                            global.profileImage = response.data['image'];
 
-                        global.userName = response.data['username'];
-                        global.subUsername = response.data['modUsername'];
-                        global.profilePhoto = response.data['photo'];
+                            //setup async storage
+                            AsyncStorage.setItem('asyncEmail', userCredential.user.email);
+                            AsyncStorage.setItem('asyncId', response.data['id']);
+                            AsyncStorage.setItem('asyncGuideId', response.data['guide_id']);
+                            AsyncStorage.setItem('asyncUid', userCredential.user.uid);
+                            AsyncStorage.setItem('asyncName', response.data['name']);
+                            AsyncStorage.setItem('asyncModName', response.data['mod_name']);
+                            AsyncStorage.setItem('asyncProfileImage', response.data['image']);
 
-                        navigation.navigate('Main', { screen: 'Home' });
-                        setIsLoading(false);
+                            setIsLoading(false)
+                            navigation.navigate('MainNavigation', { screen: 'HomePage' });
 
-                    }else{
-                        setFieldsError(response.data)
-                    }
-                }).catch(error =>{
-                    setIsLoading(false);
-                    console.log(error);
+                            console.log(response.data['id']);
+
+                        }else if(response.data['status'] == 2){
+                            console.log('deleted account');
+                            setFieldsError('User not found')
+                            setIsLoading(false)
+                        }
+                    }).catch((error) => {
+                        console.error(error.response.data);
+                        setIsLoading(false)
+                    });
                 })
-
+                .catch((error) => {
+                    console.log(error);
+                    if (error.code == "auth/invalid-email") {
+                        setFieldsError('Invalid email address')
+                        setIsLoading(false);
+                    } else if (error.code == "auth/user-not-found") {
+                        setFieldsError('User not found')
+                        setIsLoading(false);
+                    } else if (error.code == "auth/wrong-password") {
+                        setFieldsError('Wrong password')
+                        setIsLoading(false);
+                    }else if(error.code == 'auth/network-request-failed'){
+                            setFieldsError('Please check your network connection')
+                            setIsLoading(false);
+                    }else{
+                       console.log(error.code);
+                       setFieldsError('Please check your network connection')
+                       setIsLoading(false);
+                    }
+                });
             }else{
                 setIsLoading(false);
                 setFieldsError('Input fields are required')
@@ -160,14 +199,11 @@ const Login = ()=>{
     return(
 
         <SafeAreaView style={styles.body}>
-        
-        
-
             <View style={styles.container}>
 
                 {/* Activity indicator */}
                 {isLoading ? (
-                    <ActivityIndicator size="large" color="#fcba03" />
+                    <ActivityIndicator size="large" color="#000" />
                 ) :(<Text></Text>)}
 
                 <View style={styles.section1}>
@@ -175,8 +211,6 @@ const Login = ()=>{
                     <Image source={require('../../assets/images/logo.png')} resizeMode='contain' style={styles.logo} />
 
                 </View>
-
-
                 <View style={styles.section2}>
                 
                     {/* Email */}
@@ -198,7 +232,6 @@ const Login = ()=>{
                         {emailError}
                         </Text>
                     </View>
-
                     {/* Password */}
                     <View style={styles.inputContainer}>
                         <View style={styles.passwordcontainer}>
@@ -225,7 +258,6 @@ const Login = ()=>{
                         {passwordError}
                         </Text>
                     </View>
-
                     {/* Login button */}
                     <View style={styles.buttonContainer}>
                         <TouchableOpacity style={styles.button} onPress={login}>
@@ -241,16 +273,10 @@ const Login = ()=>{
                     </View>
 
                 </View>
-
-
                 <View style={styles.section3}>
-
                     <Divider/>
-
                     <TextSmall text="or signup with" />
-
                     <View style={styles.socialIconsContainer}>
-
                         <TouchableOpacity>
                             <View style={styles.icon}>
                                 <Icon name="google" size={36} color={Colors.socialIconColor} />
@@ -290,10 +316,7 @@ const Login = ()=>{
             </View>
             
         </SafeAreaView>
-        
-
     )
-
 }
 
 const windowWidth = Dimensions.get('window').width;
